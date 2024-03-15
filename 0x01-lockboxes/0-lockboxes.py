@@ -2,7 +2,7 @@
 # lockboxes
 
 def canUnlockAll(boxes):
-    unlocked = set()
+    unlocked = set() # initializing a set of boxes
 
     for box_id, box in enumerate(boxes):
         if len(box) == 0 or box_id == 0:
