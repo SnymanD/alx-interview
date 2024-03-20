@@ -5,15 +5,20 @@
 
 # Pascal’s triangle
 def printPascal(n):
-    
-
-    for i in range(n+1):
-        c=1
-        for j in range(1, i+1):
-            print(c, sep=' ', end='')
-            c=c*(i-j)//j
+    for line in range(0, n):
+        for i in range(0, line + 1):
+            print(binomialCoeff(line, i), " ", end="")
         print()
         
-# Users number choice
-n = int(input("num: "))
+def binomialCoeff(n, k):
+    res = 1
+    if (k > n - k):
+        k = n - k
+    for i in range(0, k):
+        res = res * (n - i)
+        res = res // (i + 1)
+    return res
+
+# Driver program
+n = int(input("Enter the number of rows: "))
 printPascal(n)
