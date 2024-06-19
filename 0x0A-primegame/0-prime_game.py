@@ -1,67 +1,44 @@
-#!/usr/bin/pytho3
-"""prime game"""
+#!/usr/bin/python3
+"""
+Module: Game of choosing Prime numbers 
+"""
 
 
-PlayerID = int
-PlayerName = str
-prime_map: 'dict[int, bool]' = {}
+def primeNumbers(n):
+    """Return list of prime numbers between 1 and n inclusive
+       Args:
+        n (int): upper boundary of range. lower boundary is always 1
+    """
+    primeNos = []
+    filtered = [True] * (n + 1)
+    for prime in range(2, n + 1):
+        if (filtered[prime]):
+            primeNos.append(prime)
+            for i in range(prime, n + 1, prime):
+                filtered[i] = False
+    return primeNos
 
-
-def sieveOfEratosthenes(n):
-    """Returns an array indicating prime status for numbers 1 to n (inclusive)."""
-    prime = [True] * (n + 1)
-    prime[0] = prime[1] = False
-    p = 2
-    while (p * p <= n):
-        if prime[p]:
-            for i in range(p * p, n + 1, p):
-                prime[i] = False
-        p += 1
-    return prime
-
-def playRound(r, prime_map):
-    """Simulates a round of the game and returns the winner (0 for Maria, 1 for Ben)."""
-    player = 0  # Maria starts first
-    number_range = list(range(1, r + 1))
-    
-    def switch(player):
-        return 1 - player
-
-    while True:
-        prime = 0
-        for n in number_range:
-            if prime_map[n]:
-                prime = n
-                break
-        
-        if prime == 0:
-            return switch(player)
-        
-        number_range = [n for n in number_range if n % prime != 0]
-        player = switch(player)
 
 def isWinner(x, nums):
-    """Determines the overall winner after x rounds of the game."""
-    player_names = ["Maria", "Ben"]
-    if x != len(nums):
+    """
+    Determines winner of Prime Game
+    Args:
+        x (int): no. of rounds of game
+        nums (int): upper limit of range for each round
+    Return:
+        Name of winner (Maria or Ben) or None if winner cannot be found
+    """
+    if x is None or nums is None or x == 0 or nums == []:
         return None
-    
-    max_num = max(nums)
-    prime_map = sieveOfEratosthenes(max_num)
-    
-    scores = [0, 0]
-    for n in nums:
-        winner = playRound(n, prime_map)
-        scores[winner] += 1
-    
-    if scores[0] > scores[1]:
-        return player_names[0]
-    elif scores[1] > scores[0]:
-        return player_names[1]
-    else:
-        return None
-
-# Example usage:
-x = 3
-nums = [4, 5, 1]
-print(isWinner(x, nums))  # Output should be "Ben"
+    Maria = Ben = 0
+    for i in range(x):
+        primeNos = primeNumbers(nums[i])
+        if len(primeNos) % 2 == 0:
+            Ben += 1
+        else:
+            Maria += 1
+    if Maria > Ben:
+        return 'Maria'
+    elif Ben > Maria:
+        return 'Ben'
+    return None
