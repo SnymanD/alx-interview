@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/pytho3
 """prime game"""
 
 
@@ -8,82 +8,60 @@ prime_map: 'dict[int, bool]' = {}
 
 
 def sieveOfEratosthenes(n):
-    """Returns all prime numbers from 1 - n (inclusive)."""
-    prime = [True for i in range(n+1)]
+    """Returns an array indicating prime status for numbers 1 to n (inclusive)."""
+    prime = [True] * (n + 1)
+    prime[0] = prime[1] = False
     p = 2
     while (p * p <= n):
-        if (prime[p]):
-            for i in range(p * p, n+1, p):
+        if prime[p]:
+            for i in range(p * p, n + 1, p):
                 prime[i] = False
         p += 1
     return prime
 
-
-def playRound(r: int) -> PlayerID:
-    """Play a round of primegame
-
-    Args:
-        r: the number range for this round
-    """
-    player: PlayerID = 0
+def playRound(r, prime_map):
+    """Simulates a round of the game and returns the winner (0 for Maria, 1 for Ben)."""
+    player = 0  # Maria starts first
     number_range = list(range(1, r + 1))
+    
+    def switch(player):
+        return 1 - player
 
-    def switch(player: PlayerID) -> PlayerID:
-        if player == 0:
-            return 1
-        return 0
-
-    while 1:
-        # print(f"Current Player: {player}")
+    while True:
         prime = 0
         for n in number_range:
             if prime_map[n]:
                 prime = n
                 break
-        if not prime:
+        
+        if prime == 0:
             return switch(player)
-        # print(f"Selected Prime {prime}")
-        for n in tuple(number_range):
-            if n % prime == 0:
-                # print(f"Removing {n}")
-                number_range.remove(n)
+        
+        number_range = [n for n in number_range if n % prime != 0]
         player = switch(player)
 
-
-def isWinner(x: int, nums: 'list[int]') -> 'PlayerName | None':
-    """Detect who wins a game of prime numbers.
-
-    Args:
-        x: the numbers of rounds in the game
-        nums: a list containing the number-range for each round
-
-        NOTE: len(nums) == x
-    """
-    player_names: tuple[str, str] = ("Maria", "Ben")
-    winners: list[PlayerID] = []
+def isWinner(x, nums):
+    """Determines the overall winner after x rounds of the game."""
+    player_names = ["Maria", "Ben"]
     if x != len(nums):
         return None
-
-    # we need to map numbers booleans indicating if they
-    # are prime numbers.
-    primes = sieveOfEratosthenes(max(nums))
-    for i in range(1, max(nums) + 1):
-        prime_map[i] = primes[i]
-
-    for i in range(x):
-        # print(f"Round {i + 1}")
-        winner = playRound(nums[i])
-        # print(f"Winner For Round {i + 1}: '{winner}'")
-        winners.append(winner)
-    ones = 0
-    zeros = 0
-    for w in winners:
-        if w == 1:
-            ones += 1
-        else:
-            zeros += 1
-    if ones == zeros:
-        return None
-    elif ones > zeros:
+    
+    max_num = max(nums)
+    prime_map = sieveOfEratosthenes(max_num)
+    
+    scores = [0, 0]
+    for n in nums:
+        winner = playRound(n, prime_map)
+        scores[winner] += 1
+    
+    if scores[0] > scores[1]:
+        return player_names[0]
+    elif scores[1] > scores[0]:
         return player_names[1]
-    return player_names[0]
+    else:
+        return None
+
+# Example usage:
+x = 3
+nums = [4, 5, 1]
+print(isWinner(x, nums))  # Output should be "Ben"
